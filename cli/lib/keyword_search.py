@@ -7,28 +7,28 @@ def search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
     movies = load_movies()
     results = []
     for movie in movies:
-        if find_word(query, movie["title"]):
+        if find_token(query, movie["title"]):
             results.append(movie)
         if len(results) >= limit:
             break
     return results
 
 
-def find_word(query: str, movie_title: str) -> bool:
-    query_words = process_text(query)
-    movie_title = " ".join(process_text(movie_title))
-    for word in query_words:
-        if word in movie_title:
+def find_token(query: str, movie_title: str) -> bool:
+    query_tokens = tokenize(query)
+    movie_title = " ".join(tokenize(movie_title))
+    for token in query_tokens:
+        if token in movie_title:
             return True
     return False
 
 
-def process_text(query: str) -> list[str]:
+def tokenize(query: str) -> list[str]:
     query = query.lower()
     query = remove_punctuations(query)
-    query_words = remove_stopwords(query)
-    stemmed_query_words = [stem_word(word) for word in query_words]
-    return stemmed_query_words
+    query_tokens = remove_stopwords(query)
+    stemmed_query_tokens = [stem_token(token) for token in query_tokens]
+    return stemmed_query_tokens
 
 
 def remove_punctuations(query: str) -> str:
@@ -38,14 +38,14 @@ def remove_punctuations(query: str) -> str:
 
 def remove_stopwords(query: str) -> list[str]:
     stopwords = load_stopwords()
-    query_words = query.split()
-    new_query_words = []
-    for word in query_words:
-        if word not in stopwords:
-            new_query_words.append(word)
-    return new_query_words
+    query_tokens = query.split()
+    new_query_tokens = []
+    for token in query_tokens:
+        if token not in stopwords:
+            new_query_tokens.append(token)
+    return new_query_tokens
 
 
-def stem_word(word: str) -> str:
+def stem_token(token: str) -> str:
     stemmer = PorterStemmer()
-    return stemmer.stem(word)
+    return stemmer.stem(token)
