@@ -1,4 +1,5 @@
 import string
+from nltk.stem import PorterStemmer
 from .search_utils import DEFAULT_SEARCH_LIMIT, load_movies, load_stopwords
 
 
@@ -26,7 +27,8 @@ def process_text(query: str) -> list[str]:
     query = query.lower()
     query = remove_punctuations(query)
     query_words = remove_stopwords(query)
-    return query_words
+    stemmed_query_words = [stem_word(word) for word in query_words]
+    return stemmed_query_words
 
 
 def remove_punctuations(query: str) -> str:
@@ -42,3 +44,8 @@ def remove_stopwords(query: str) -> list[str]:
         if word not in stopwords:
             new_query_words.append(word)
     return new_query_words
+
+
+def stem_word(word: str) -> str:
+    stemmer = PorterStemmer()
+    return stemmer.stem(word)
