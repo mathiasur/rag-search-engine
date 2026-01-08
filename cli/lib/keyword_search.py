@@ -1,24 +1,44 @@
 import string
-from .search_utils import DEFAULT_SEARCH_LIMIT, load_movies
+from .search_utils import DEFAULT_SEARCH_LIMIT, load_movies, load_stopwords
 
 
 def search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
     movies = load_movies()
     results = []
     for movie in movies:
-        if process_text(query) in process_text(movie["title"]):
+        if find_word(query, movie["title"]):
             results.append(movie)
-            if len(results) >= limit:
-                break
+        if len(results) >= limit:
+            break
     return results
 
 
-def process_text(query: str) -> str:
+def find_word(query: str, movie_title: str) -> bool:
+    query_words = process_text(query)
+    movie_title = " ".join(process_text(movie_title))
+    for word in query_words:
+        if word in movie_title:
+            return True
+    return False
+
+
+def process_text(query: str) -> list[str]:
     query = query.lower()
     query = remove_punctuations(query)
-    return query
+    query_words = remove_stopwords(query)
+    return query_words
 
 
 def remove_punctuations(query: str) -> str:
     table = str.maketrans("", "", string.punctuation)
     return query.translate(table)
+
+
+def remove_stopwords(query: str) -> list[str]:
+    stopwords = load_stopwords()
+    query_words = query.split()
+    new_query_words = []
+    for word in query_words:
+        if word not in stopwords:
+            new_query_words.append(word)
+    return new_query_words
