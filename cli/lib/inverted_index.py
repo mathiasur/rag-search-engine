@@ -1,6 +1,8 @@
 import pickle
+
 from pathlib import Path
-from .search_utils import tokenize
+
+from .search_utils import process_text
 from .search_utils import load_movies
 
 
@@ -9,9 +11,8 @@ class InvertedIndex:
     docmap = {}  # map document IDs to their full document objects
 
     def __add_document(self, doc_id, text):
-        tokens = tokenize(text)
+        tokens = process_text(text)
         for token in tokens:
-            token = token.lower()
             if token not in self.index:
                 self.index[token] = set()
             self.index[token].add(doc_id)
@@ -32,7 +33,7 @@ class InvertedIndex:
     def save(self):
         cache_dir = Path("cache")
         cache_dir.mkdir(parents=True, exist_ok=True)
-        
+
         index_file_path = cache_dir / "index.pkl"
         with open(index_file_path, "wb") as f:
             pickle.dump(self.index, f)
@@ -40,3 +41,18 @@ class InvertedIndex:
         docmap_file_path = cache_dir / "docmap.pkl"
         with open(docmap_file_path, "wb") as f:
             pickle.dump(self.docmap, f)
+
+    def load(self):
+        if not Path("cache/index.pkl").exists():
+            print("The index.pkl file is not found")
+            return
+        
+        if not Path("cache/docmap.pkl").exists():
+            print("The docmap.pkl file is not found")
+            return
+        
+        with open("index.pkl", "rb") as f:
+            self.index = pickle.load(f)
+            
+        with open("docmap.pkl", "rb") as f:
+            self.index = pickle.load(f)
