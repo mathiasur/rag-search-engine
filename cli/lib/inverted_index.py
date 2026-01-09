@@ -51,8 +51,8 @@ class InvertedIndex:
             print("The docmap.pkl file is not found")
             return
         
-        with open("index.pkl", "rb") as f:
+        with open("cache/index.pkl", "rb") as f:
             self.index = pickle.load(f)
             
-        with open("docmap.pkl", "rb") as f:
-            self.index = pickle.load(f)
+        with open("cache/docmap.pkl", "rb") as f:
+            self.docmap = pickle.load(f)

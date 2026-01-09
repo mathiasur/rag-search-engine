@@ -1,22 +1,25 @@
-from .search_utils import DEFAULT_SEARCH_LIMIT, load_movies, process_text
+from pathlib import Path
+
+from .search_utils import DEFAULT_SEARCH_LIMIT, process_text
 
 
-def search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
-    movies = load_movies()
+def search_command(query: str, index, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
+    if not Path("data/movies.json").exists():
+        print("The movies.json file is not found")
+        return
+    
+    if not Path("cache/index.pkl").exists():
+        print("The index.pkl file is not found")
+        return
+
     results = []
-    print(process_text(query))
-    for movie in movies:
-        if find_token(query, movie["title"]):
-            results.append(movie)
-        if len(results) >= limit:
-            break
+    index.load()
+    query_tokens = process_text(query)
+    
+    for token in query_tokens:
+        docs = index.get_documents(token)
+        if docs is not None:
+            for doc in docs:
+                results.append(index.docmap[doc])
+
     return results
-
-
-def find_token(query: str, movie_title: str) -> bool:
-    processed_query = process_text(query)
-    processed_title = " ".join(process_text(movie_title))
-    for token in processed_query:
-        if token in processed_title:
-            return True
-    return False

@@ -12,24 +12,23 @@ def main() -> None:
 
     search_parser = subparsers.add_parser("search", help="Search movies using BM25")
     search_parser.add_argument("query", type=str, help="Search query")
-    
+
     build_parser = subparsers.add_parser("build", help="Build and save inverted index")
 
     args = parser.parse_args()
+    index = InvertedIndex()
 
     match args.command:
         case "search":
             print("Searching for:", args.query)
-            results = search_command(args.query)
+            results = search_command(args.query, index)
             for i, res in enumerate(results, 1):
                 print(f"{i}. {res['title']}")
         case "build":
             print("Building inverted index...")
-            index = InvertedIndex()
             index.build()
             index.save()
-            docs = index.get_documents('merida')
-            print(f"First document for token 'merida' = {docs[0]}")
+            print("The index was successfully built!")
         case _:
             parser.print_help()
 
