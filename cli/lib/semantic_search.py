@@ -213,7 +213,7 @@ def semantic_chunk(
         chunk = " ".join(cleaned_sentences)
         chunks.append(chunk)
         i += max_chunk_size - overlap
-        
+
     return chunks
 
 
